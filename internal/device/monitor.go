@@ -10,11 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/gousb"
 	"github.com/fsnotify/fsnotify"
-	"github.com/sanjay7178/go-ukip/config"
-	"github.com/sanjay7178/go-ukip/keystroke"
-	"github.com/sanjay7178/go-ukip/logging"
+	"github.com/google/gousb"
+	"github.com/sanjay7178/go-ukip/internal/config"
+	"github.com/sanjay7178/go-ukip/internal/keystroke"
+	"github.com/sanjay7178/go-ukip/internal/logging"
 )
 
 type Monitor struct {
@@ -147,6 +147,56 @@ func (m *Monitor) openDevice(devicePath string) (*gousb.Device, error) {
 	return dev, nil
 }
 
+// func (m *Monitor) monitorDevice(devicePath string, dev *gousb.Device) {
+// 	defer func() {
+// 		m.mutex.Lock()
+// 		delete(m.devices, devicePath)
+// 		m.mutex.Unlock()
+// 		dev.Close()
+// 	}()
+
+// 	// Open the device file
+// 	file, err := os.Open(devicePath)
+// 	if err != nil {
+// 		logging.Log.Errorf("Failed to open device file %s: %v", devicePath, err)
+// 		return
+// 	}
+// 	defer file.Close()
+
+// 	buffer := make([]byte, 24) // Typical size for an input event
+
+// 	for {
+// 		select {
+// 		case <-m.done:
+// 			return
+// 		default:
+// 			n, err := file.Read(buffer)
+// 			if err != nil {
+// 				logging.Log.Errorf("Error reading from device %s: %v", devicePath, err)
+// 				return
+// 			}
+
+// 			if n == 24 { // Full event read
+// 				timestamp := time.Now()
+// 				eventType := uint16(buffer[16]) | uint16(buffer[17])<<8
+// 				code := uint16(buffer[18]) | uint16(buffer[19])<<8
+// 				value := int32(buffer[20]) | int32(buffer[21])<<8 | int32(buffer[22])<<16 | int32(buffer[23])<<24
+
+// 				if eventType == 1 && value == 1 { // Key press event
+// 					m.processor.ProcessKeystroke(
+// 						devicePath,
+// 						dev.Desc.Product, // Error go right here
+// 						fmt.Sprintf("%04x", dev.Desc.Vendor),
+// 						fmt.Sprintf("%04x", dev.Desc.Product),
+// 						rune(code),
+// 						timestamp,
+// 					)
+// 				}
+// 			}
+// 		}
+// 	}
+// }
+
 func (m *Monitor) monitorDevice(devicePath string, dev *gousb.Device) {
 	defer func() {
 		m.mutex.Lock()
@@ -185,7 +235,7 @@ func (m *Monitor) monitorDevice(devicePath string, dev *gousb.Device) {
 				if eventType == 1 && value == 1 { // Key press event
 					m.processor.ProcessKeystroke(
 						devicePath,
-						dev.Desc.Product,
+						dev.Desc.Product.String(), // Convert gousb.ID to string
 						fmt.Sprintf("%04x", dev.Desc.Vendor),
 						fmt.Sprintf("%04x", dev.Desc.Product),
 						rune(code),

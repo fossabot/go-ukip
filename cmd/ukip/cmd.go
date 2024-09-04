@@ -1,20 +1,26 @@
 package main
 
 import (
-	"log"
+	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/sanjay7178/go-ukip/internal/config"
 	"github.com/sanjay7178/go-ukip/internal/device"
 	"github.com/sanjay7178/go-ukip/internal/logging"
-	"github.com/sanjay7178/go-ukip/internal/config"
 )
 
 func main() {
+	// Parse command-line flags
+	_ = flag.String("config", "/etc/ukip/config.json", "Path to configuration file")
+	flag.Parse()
+
 	// Initialize logging
 	if err := logging.Init(); err != nil {
-		log.Fatalf("Failed to initialize logging: %v", err)
+		fmt.Fprintf(os.Stderr, "Failed to initialize logging: %v\n", err)
+		os.Exit(1)
 	}
 
 	// Load configuration
@@ -30,14 +36,23 @@ func main() {
 	}
 
 	// Start monitoring
-	go monitor.Start()
+	if err := monitor.Start(); err != nil {
+		logging.Log.Fatalf("Failed to start device monitor: %v", err)
+	}
 
-	// Wait for termination signal
+	logging.Log.Info("UKIP started successfully")
+
+	// Set up signal handling for graceful shutdown
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	// Wait for termination signal
 	<-sigChan
 
-	// Cleanup and exit
+	logging.Log.Info("Shutting down UKIP...")
+
+	// Stop the monitor
 	monitor.Stop()
+
 	logging.Log.Info("UKIP stopped")
 }

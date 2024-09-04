@@ -1,0 +1,12 @@
+[Unit]
+Description=UKIP
+Requires=systemd-udevd.service
+After=systemd-udevd.service
+
+[Service]
+ExecStart=/usr/local/bin/ukip
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
