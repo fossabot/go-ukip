@@ -14,12 +14,13 @@ mkdir -p /etc/ukip
 mkdir -p /usr/local/bin
 
 # Copy the main binary
-cp cmd/ukip/ukip /usr/local/bin/ukip
+cp ukip /usr/local/bin/ukip
 chmod +x /usr/local/bin/ukip
 
 # Copy configuration files
 cp configs/allowlist.txt /etc/ukip/allowlist
 cp configs/keycodes.json /etc/ukip/keycodes
+cp configs/config.json /etc/ukip/config.json
 
 # Copy and enable the systemd service
 cp configs/ukip.service /etc/systemd/system/

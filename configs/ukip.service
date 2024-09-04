@@ -1,7 +1,6 @@
 [Unit]
-Description=UKIP
-Requires=systemd-udevd.service
-After=systemd-udevd.service
+Description=UKIP (USB Keystroke Injection Protection)
+After=network.target
 
 [Service]
 ExecStart=/usr/local/bin/ukip

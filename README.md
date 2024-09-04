@@ -1,8 +1,65 @@
 # go-ukip
-cross platform runtime protection from usb keystroke injection , DNS assignment over DHCP spoof attacks via BadUSB 
-# Under Development 
+
+cross platform runtime protection from usb keystroke injection , DNS assignment over DHCP spoof attacks via BadUSB
+
+# Under Development
+
+### Installation
+
+1. Clone the repository:
+
+   ```
+   git clone https://github.com/sanjay7178/go-ukip.git
+   cd go-ukip
+   ```
+
+2. Build the project:
+
+   ```
+   go build
+   ```
+
+3. After building your Go project, run the installation script:
+
+   ```
+   sudo ./install.sh
+   ```
+
+   This script will copy the binary to `/usr/local/bin/ukip`, copy the configuration files to `/etc/ukip/`, and set up the systemd service.
+
+4. You can then start the service with:
+
+   ```
+   sudo systemctl start ukip
+   ```
+
+   And check its status with:
+
+   ```
+   sudo systemctl status ukip
+   ```
+
+5. To ensure the service starts on boot, enable it:
+
+   ```
+   sudo systemctl enable ukip
+   ```
+
+Remember, since UKIP needs to access USB devices, it typically needs to run as root. That's why the service file specifies `User=root` and why the installation script needs to be run with sudo.
+
+Also, make sure that your Go binary is built for the correct architecture of your system. If you're building on the same system where you'll run UKIP, this shouldn't be an issue.
+
+If you make changes to the UKIP binary in the future, you'll need to copy it to `/usr/local/bin/` again and restart the service:
+
+```
+sudo cp ukip /usr/local/bin/ukip
+sudo systemctl restart ukip
+```
+
+This process ensures that your UKIP binary is in the correct location, the service file points to this location, and the service is set up to run automatically on system boot.
 
 ### Project Structure
+
 ```bash
 ukip/
 │
@@ -35,87 +92,73 @@ ukip/
 └── README.md
 ```
 
-# UKIP Configuration Files Metadata
 
-## ukip.service
+### Contributing Instructions
 
-### Purpose
-This file is a systemd service unit configuration file for the UKIP (USB Keystroke Injection Protection) service. It defines how and when the UKIP service should be started, stopped, and managed by the systemd init system.
+The `gousb` package requires `libusb-1.0` to be installed on your system. Let's address this issue step by step:
 
-### Project Location
-```
-ukip/configs/ukip.service
-```
-
-### System Installation Location
-```
-/etc/systemd/system/ukip.service
-```
-
-### Content Format
-Text file in systemd unit file format. It typically includes sections like [Unit], [Service], and [Install].
-
-### Example Content
-```ini
-[Unit]
-Description=UKIP
-Requires=systemd-udevd.service
-After=systemd-udevd.service
-
-[Service]
-ExecStart=/usr/local/bin/ukip
-Restart=always
-User=root
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### Notes
-- The service is set to start after the udev service, which is necessary for USB device detection.
-- It's configured to always restart if it stops, ensuring continuous protection.
-- The service runs as root, which is typically necessary for USB device monitoring.
-
-## allowlist.txt
-
-### Purpose
-This file contains a list of allowed USB devices and their permitted keystrokes. It's used by UKIP to determine which devices should be exempt from keystroke injection protection or which specific keystrokes should be allowed for certain devices.
-
-### Project Location
-```
-ukip/configs/allowlist.txt
-```
-
-### System Installation Location
-```
-/etc/ukip/allowlist
-```
-
-### Content Format
-Text file with each line representing a device and its allowed keystrokes. The format is:
+1. First, we need to install the required dependencies. On a Ubuntu/Debian system, you can do this with the following commands:
 
 ```
-<product ID in hex>:<vendor ID in hex> <allowed characters, comma separated>
+
+sudo apt update
+sudo apt install libusb-1.0-0-dev pkg-config
+
 ```
 
-### Example Content
-```
-# Yubikey example
-0x0010:0x1050 c,b,d,e,f,g,h,i,j,k,l,n,r,t,u,v
+2. After installing these packages, try building your project again:
 
-# Allow all characters for a specific device
-0x1234:0x5678 any
-
-# Block all characters for a specific device
-0x9ABC:0xDEF0 none
 ```
 
-### Notes
-- Lines starting with '#' are treated as comments.
-- The 'any' keyword allows all characters for a device.
-- The 'none' keyword blocks all characters for a device.
-- If a device is not listed, it's treated as if 'none' was specified.
-- The file should be readable by the UKIP service (typically root-owned with 644 permissions).
+go build
+
 ```
 
-This metadata provides a comprehensive overview of these two critical configuration files for the UKIP system. It includes their purpose, locations both within the project and on the installed system, content format, and example content. This information is crucial for developers working on UKIP, system administrators installing or managing UKIP, and anyone trying to understand or modify UKIP's configuration.
+If you still encounter issues, here are a few more things to check:
+
+3. Ensure that the `PKG_CONFIG_PATH` environment variable includes the directory containing `libusb-1.0.pc`. You can check this with:
+
+```
+
+pkg-config --list-all | grep libusb
+
+```
+
+If it doesn't show up, you might need to set the `PKG_CONFIG_PATH`. The exact path can vary, but it's often something like:
+
+```
+
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/x86_64-linux-gnu/pkgconfig
+
+```
+
+4. If you're still having issues, you might need to install `gcc` if it's not already on your system:
+
+```
+
+sudo apt install build-essential
+
+```
+
+5. After making these changes, clean your Go module cache and try building again:
+
+```
+
+go clean -modcache
+go build
+
+```
+
+If you continue to face issues, please provide the full error message you're getting after trying these steps. It would also be helpful to know the output of:
+
+```
+
+go version
+uname -a
+
+```
+
+This will give us more information about your Go version and system, which can help in troubleshooting.
+
+Remember, working with USB devices often requires elevated privileges. When you run your UKIP application, you might need to use `sudo` or set up appropriate udev rules to allow non-root access to USB devices.
+```
