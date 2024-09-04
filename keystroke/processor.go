@@ -4,9 +4,9 @@ import (
 	"container/ring"
 	"time"
 
-	"github.com/sanjay7178/ukip/allowlist"
-	"github.com/sanjay7178/ukip/config"
-	"github.com/sanjay7178/ukip/logging"
+	"github.com/sanjay7178/go-ukip/allowlist"
+	"github.com/sanjay7178/go-ukip/config"
+	"github.com/sanjay7178/go-ukip/logging"
 )
 
 type Keystroke struct {

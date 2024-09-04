@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/sanjay7178/ukip/config"
-	"github.com/sanjay7178/ukip/device"
-	"github.com/sanjay7178/ukip/logging"
+	"github.com/sanjay7178/go-ukip/device"
+	"github.com/sanjay7178/go-ukip/logging"
+	"github.com/sanjay7178/go-ukip/config"
 )
 
 func main() {
