@@ -1,4 +1,6 @@
 # go-ukip
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsanjay7178%2Fgo-ukip.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsanjay7178%2Fgo-ukip?ref=badge_shield)
+
 
 cross platform runtime protection from usb keystroke injection , DNS assignment over DHCP spoof attacks via BadUSB
 
@@ -162,3 +164,7 @@ This will give us more information about your Go version and system, which can h
 
 Remember, working with USB devices often requires elevated privileges. When you run your UKIP application, you might need to use `sudo` or set up appropriate udev rules to allow non-root access to USB devices.
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsanjay7178%2Fgo-ukip.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsanjay7178%2Fgo-ukip?ref=badge_large)
